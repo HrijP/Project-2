@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homography and Image Rectification Report</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #eef2f7;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 4px solid #3498db;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #2980b9;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #3498db;
+            font-size: 1.8em;
+            border-left: 6px solid #3498db;
+            padding-left: 15px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        h3 {
+            color: #555;
+            font-size: 1.3em;
+            margin-top: 25px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+        p, ul, ol {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        .abstract {
+            background-color: #f7f9fc;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            font-style: italic;
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .code-snippet {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85em;
+            margin: 25px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .figure-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            gap: 20px;
+        }
+        .figure-item {
+            flex-basis: 45%;
+            min-width: 300px;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .figure-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .caption {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <header>
+            <h1>Homography and Image Rectification</h1>
+            <p>Hrijan Pandit | Computer Vision | <script>document.write(new Date().toLocaleDateString());</script></p>
+        </header>
+
+        <div class="abstract">
+            <h3>Abstract</h3>
+            <p>This project explores the application of geometric transformations, specifically 2D projective <strong>homography</strong>, to perform <strong>image rectification</strong>. Part 1 demonstrates the recovery of a fronto-parallel view from a tilted planar surface using the Direct Linear Transform (DLT) algorithm. Part 2 applies this technique creatively to simulate a real-world document scanner from a photograph taken at an angle.</p>
+        </div>
+
+        <h2>Part 1: Image Homography Estimation (Rectification)</h2>
+
+        <p>The objective was to estimate the homography matrix <strong>H</strong> between a distorted plane in an image and a desired rectangular plane, and use this to rectify the original image.</p>
+
+        <h3>Methodology</h3>
+        <ol>
+            <li><strong>Point Correspondence:</strong> Four (or more) non-collinear corresponding points were manually selected.</li>
+            <li><strong>Homography Estimation (DLT):</strong> The 3×3 homography matrix <strong>H</strong> was computed using the <strong>Direct Linear Transform (DLT)</strong> algorithm, solving a system of linear equations (<em>A·h = 0</em>) via Singular Value Decomposition (SVD).</li>
+            <li><strong>Image Warping (Inverse Mapping):</strong> The final rectified image was generated using the <strong>inverse homography (H⁻¹)</strong> and <strong>inverse mapping</strong> with bilinear interpolation to ensure complete coverage.</li>
+        </ol>
+
+        <h3>Results and Visualization</h3>
+        <div class="figure-container">
+            <div class="figure-item">
+                <img src="original_image_part1.png" alt="Part 1 Original Image">
+                <p class="caption">Figure 1.1: Original Tilted Image (Scene 1-b example) with selected source region shown.</p>
+            </div>
+            <div class="figure-item">
+                <img src="rectified_image_part1.png" alt="Part 1 Rectified Image">
+                <p class="caption">Figure 1.2: Rectified Output, recovering the fronto-parallel view.</p>
+            </div>
+        </div>
+
+        <h3>Discussion: How Homography Enables Rectification</h3>
+        <p>A <strong>Homography (H)</strong> is a projective transformation that maps points from one plane to another. It is ideal for image rectification because it accurately models the change in view caused by perspective projection when a <strong>planar object</strong> is viewed at an oblique angle.</p>
+        <ul>
+            <li><strong>Modeling Distortion:</strong> The homography matrix <strong>H</strong> encodes the exact perspective distortion between the original, tilted image plane and the desired <strong>fronto-parallel</strong> rectangular plane.</li>
+            <li><strong>Reversing Perspective:</strong> Rectification is achieved by applying the <strong>inverse homography (H⁻¹)</strong> via inverse mapping. This maps every pixel coordinate in the rectangular output view back to its undistorted location, effectively reversing the perspective to recover the true planar geometry.</li>
+        </ul>
+
+        <h2>Part 2: Creative Application (Document Scanning)</h2>
+
+        <p>The creative application simulates a <strong>document scanner</strong> by rectifying an angled photograph of a handwritten note, transforming it into a flat, readable document.</p>
+
+        <h3>Execution Details</h3>
+        <p>The core homography code from Part 1 was reused. The destination was set to an <strong>A4 aspect ratio</strong> (800 × 1133 pixels). The following source points were manually defined based on image analysis:</p>
+
+        <div class="code-snippet">
+<pre>
+# Source points based on manual analysis of the tilted document
+src_points_doc = np.array([
+    [200, 150],   # Top-Left 
+    [1000, 150],  # Top-Right 
+    [1000, 3950], # Bottom-Right 
+    [200, 3950]   # Bottom-Left 
+], dtype=np.float32)
+
+# Target size based on A4 aspect ratio
+target_rect_height, target_rect_width = 1133, 800
+</pre>
+        </div>
+
+        <h3>Results and Analysis</h3>
+
+        <div class="figure-container">
+            <div class="figure-item">
+                <img src="original_document.jpg" alt="Part 2 Original Document">
+                <p class="caption">Figure 2.1: Original Tilted Document Photo (Source).</p>
+            </div>
+            <div class="figure-item">
+                <img src="rectified_document.png" alt="Part 2 Rectified Document">
+                <p class="caption">Figure 2.2: Rectified “Scanned” Document Output.</p>
+            </div>
+        </div>
+
+        <h4>What Worked Well and Challenges</h4>
+        <ul>
+            <li><strong>Success:</strong> The resulting image is a clean, rectangular document. The use of a standard aspect ratio for the destination ensured correct planar proportions.</li>
+            <li><strong>Challenges:</strong>
+                <ol>
+                    <li><strong>Accuracy:</strong> Manual point selection required careful refinement, as even minor sub-pixel errors led to slight distortions in the output (e.g., wavy lines).</li>
+                    <li><strong>Lighting:</strong> Homography only corrects geometry. Non-uniform lighting and shadows in the original photo were preserved, necessitating further photometric correction for a perfect “scan.”</li>
+                </ol>
+            </li>
+        </ul>
+
+        <footer>
+            <hr style="margin-top: 40px; border-color: #ccc;">
+            <p style="text-align: center; font-size: 0.8em; color: #7f8c8d;">Submission for Computer Vision Course</p>
+        </footer>
+    </div>
+</body>
+</html>
